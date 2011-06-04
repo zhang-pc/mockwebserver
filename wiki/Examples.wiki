@@ -83,3 +83,26 @@ In this test we check that a new socket is opened when a connection times out. W
         assertEquals(0, server.takeRequest().getSequenceNumber());
     }
 }}}
+
+===Any HTTP Client===
+This example uses [http://hc.apache.org/httpcomponents-client-ga/ Apache HTTP client] with !MockWebServer.
+{{{
+    public void testApacheHttpClient() throws Exception {
+        server.enqueue(new MockResponse().setBody("hello world"));
+        server.play();
+
+        URL url = server.getUrl("/");
+        DefaultHttpClient client = new DefaultHttpClient();
+        HttpGet get = new HttpGet(url.toURI());
+        get.addHeader("Accept-Language", "en-US");
+        HttpResponse response = client.execute(get);
+        InputStream in = response.getEntity().getContent();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        assertEquals(HttpURLConnection.HTTP_OK, response.getStatusLine().getStatusCode());
+        assertEquals("hello world", reader.readLine());
+
+        RecordedRequest request = server.takeRequest();
+        assertEquals("GET / HTTP/1.1", request.getRequestLine());
+        assertTrue(request.getHeaders().contains("Accept-Language: en-US"));
+    }
+}}}
