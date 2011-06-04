@@ -78,7 +78,7 @@ In this test we check that a new socket is opened when a connection times out. W
         assertEquals('F', in2.read());
         assertEquals(-1, in2.read());
 
-        // both requests come on new connections
+        // each request comes on its own socket connection
         assertEquals(0, server.takeRequest().getSequenceNumber());
         assertEquals(0, server.takeRequest().getSequenceNumber());
     }
